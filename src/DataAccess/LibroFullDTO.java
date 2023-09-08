@@ -13,8 +13,7 @@ public class LibroFullDTO extends SQLiteDataHelper {
         String query = "SELECT ra.Resena AS Comentario, lib.NombreLibro AS Libro, au.NombreAutor AS Autor " +
                        "FROM RESENA ra " +
                        "JOIN LIBRO lib ON lib.IdLibro = ra.IdLibro " +
-                       "JOIN AUTOR au ON au.IdAutor = ra.IdAutor " +
-                       "WHERE ra.IdResena IdBETWEEN ? AND ? ";
+                       "JOIN AUTOR au ON au.IdAutor = ra.IdAutor " ;
          try{
             Connection connection = openConnection();
              Statement stmt = connection.createStatement();

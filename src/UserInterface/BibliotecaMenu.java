@@ -47,7 +47,12 @@ public BibliotecaMenu() throws AppExceptionAriel {
     public void actionPerformed(ActionEvent e) {
         if(e.getSource()==mostrarTabla){
             mostrarTabla.setVisible(false); 
-            mostrarInfo();
+            try {
+                mostrarInfo();
+            } catch (AppExceptionAriel e1) {
+                
+                e1.printStackTrace();
+            }
         }
     }
     });
@@ -56,73 +61,30 @@ public BibliotecaMenu() throws AppExceptionAriel {
     pack();
     setLocationRelativeTo(null);
 }
-
-private void generarTabla() {
+private void showTable() throws AppExceptionAriel {
     String[] header = {"Comentario", "Libro", "Autor"};
-    Object[][] data = new Object[nroRegistros][3]; 
-
-    tableModel = new DefaultTableModel(data, header); 
-    table = new JTable(tableModel); 
-
+    Object[][] data = new Object[bibliotecaBL.getAllData().size()][3];  
+    int index = 0;
+    for(Biblioteca bli : bibliotecaBL.getAllData()) {
+        data[index][0] = bli.getReseña();
+        data[index][1] = bli.getNombreLibro();
+        data[index][2] = bli.getNombreAutor();
+        index++;
+    }
+    
+    JTable table  = new JTable(data, header);
     table.setShowHorizontalLines(true);
-    table.setGridColor(Color.BLACK);
+    table.setGridColor(Color.lightGray);
     table.setRowSelectionAllowed(true);
     table.setColumnSelectionAllowed(false);
+
     table.setPreferredScrollableViewportSize(new Dimension(650, 150));
+    table.setFillsViewportHeight(true);
 
     pnlTabla.removeAll();
     pnlTabla.add(table);
     JScrollPane scrollPane = new JScrollPane(table);
     pnlTabla.add(scrollPane);
-}
-
-private void mostrarPaginado(int page) {
-    pagActual = page;
-    int inicioPagina = (page - 1) * nroRegistros;
-    int nroFinalPag = Math.min(inicioPagina + nroRegistros, biblioData.size());
-
-    Object[][] datosPagina = new Object[nroRegistros][3];
-
-    for (int i = inicioPagina; i < nroFinalPag; i++) {
-        Biblioteca bli = biblioData.get(i);
-        datosPagina[i - inicioPagina][0] = bli.getReseña();
-        datosPagina[i - inicioPagina][1] = bli.getNombreLibro();
-        datosPagina[i - inicioPagina][2] = bli.getNombreAutor();
-    }
-    tableModel.setDataVector(datosPagina, new String[]{"<html><font color='#e2c15c'>Comentario</font></html>", 
-                                                    "<html><font color='#e2c1 5c'>Libro</font></html>", 
-                                                    "<html><font color='#e2c15c'>Correo electr\u00F3nico</font></html>"});
-}
-private void botonPaginado() {
-    panelBotonPaginado = new JPanel();
-    JButton pagAnterior = new JButton("<-");
-    JButton pagPosterior = new JButton("->");
-
-    pagAnterior.setBackground(Color.CYAN);
-    pagPosterior.setBackground(Color.CYAN);
-    pagAnterior.addActionListener(new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if (pagActual > 1) {
-                mostrarPaginado(pagActual - 1);
-            }
-        }
-    });
-
-    pagPosterior.addActionListener(new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            int totalPages = (int) Math.ceil((double) biblioData.size() / nroRegistros);
-            if (pagActual < totalPages) {
-                mostrarPaginado(pagActual + 1);
-            }
-        }
-    });
-
-    panelBotonPaginado.add(pagAnterior);
-    panelBotonPaginado.add(pagPosterior);
-    panelBotonPaginado.setLocation(500, 500);
-    add(panelBotonPaginado);
 }
 
     public void setGridBagLayout(){
@@ -142,10 +104,8 @@ private void botonPaginado() {
         bibliotecaSplash.mostrarPantallazo();
         setVisible(true); 
     }
-    private void mostrarInfo() {
-        generarTabla(); 
-        mostrarPaginado(pagActual); 
-        botonPaginado(); 
+    private void mostrarInfo() throws AppExceptionAriel {
+        showTable();
     }
     @Override
     public void actionPerformed(ActionEvent e) {
